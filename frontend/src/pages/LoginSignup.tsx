@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/auth-context';
 
 const themeBg = 'bg-gradient-to-br from-[#020209] via-[#07071a] to-[#1a2a3a]';
 const cardBg = 'bg-[#07071a] border border-[#1a2a3a] shadow-2xl';
@@ -12,6 +13,7 @@ const LoginSignup = () => {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,7 +32,9 @@ const LoginSignup = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Error');
       setUser(data.user || null);
-      // Redirect to dashboard on success
+      // Set authentication and redirect to dashboard on success
+      const userName = data.user?.name || form.name || form.email;
+      login(userName);
       navigate('/', { state: { user: data.user } });
     } catch (err) {
       setError(err.message);
@@ -48,10 +52,10 @@ const LoginSignup = () => {
           <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[#1a2a3a] mb-2 border-2 border-[#4dffb4]">
             <span style={{ fontSize: '2.5rem' }}>👤</span>
           </div>
-          <h2 className={`text-3xl font-extrabold mb-1 ${accent} font-mono text-center`} style={{ letterSpacing: '2px' }}>
+          <h2 className="text-3xl font-extrabold mb-3 font-mono text-center" style={{ color: '#4dffb4', letterSpacing: '2px' }}>
             {isLogin ? 'Login' : 'Sign Up'}
           </h2>
-          <div className="text-xs text-[#4a5568] tracking-widest font-mono-display">SOCIAL AUTOPILOT</div>
+          <div className="text-4xl font-black tracking-wider" style={{ background: 'linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '8px', fontFamily: "'Orbitron', monospace", letterSpacing: '3px' }}>SOCIALPULSE</div>
         </div>
         {!isLogin && (
           <input

@@ -24,11 +24,11 @@ function ContactSphere({ contact, position, onClick }: ContactSphereProps) {
   const [hovered, setHovered] = useState(false);
   const color = useMemo(() => {
     switch (contact.state) {
-      case "Thriving": return "#2dd4a8";
-      case "Stable": return "#eab308";
-      case "Drifting": return "#f97316";
-      case "At Risk": return "#ef4444";
-      default: return "#fff";
+      case "Thriving": return "#00ff88";
+      case "Stable": return "#ffff00";
+      case "Drifting": return "#ffaa00";
+      case "At Risk": return "#ff2563";
+      default: return "#00d9ff";
     }
   }, [contact.state]);
   const size = 0.16;
@@ -46,7 +46,7 @@ function ContactSphere({ contact, position, onClick }: ContactSphereProps) {
   return (
     <group>
       {/* Glowing trail */}
-      <Sparkles count={6} scale={[size*2.2, size*2.2, size*2.2]} color={color} speed={0.8} opacity={0.6} position={animatedPos} />
+      <Sparkles count={12} scale={[size*2.8, size*2.8, size*2.8]} color={color} speed={1.2} opacity={0.8} position={animatedPos} />
       {/* Main orb */}
       <mesh
         ref={meshRef}
@@ -58,29 +58,30 @@ function ContactSphere({ contact, position, onClick }: ContactSphereProps) {
         <meshPhysicalMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={hovered ? 1.3 : 0.8}
-          roughness={0.12}
-          metalness={0.8}
+          emissiveIntensity={hovered ? 1.6 : 1.0}
+          roughness={0.08}
+          metalness={0.9}
           clearcoat={1}
-          clearcoatRoughness={0.08}
-          transmission={0.8}
-          thickness={0.8}
+          clearcoatRoughness={0.05}
+          transmission={0.9}
+          thickness={0.9}
           ior={1.5}
-          reflectivity={0.9}
-          opacity={0.97}
+          reflectivity={0.95}
+          opacity={0.98}
           transparent
         />
       </mesh>
       {/* Name label - always follows bubble */}
       <Text
-        position={[animatedPos[0], animatedPos[1] + size + 0.07, animatedPos[2]]}
-        fontSize={0.11}
-        color={hovered ? "#fff" : color}
+        position={[animatedPos[0], animatedPos[1] + size + 0.09, animatedPos[2]]}
+        fontSize={0.12}
+        color={hovered ? "#ffffff" : color}
         anchorX="center"
         anchorY="bottom"
         outlineColor="#000"
-        outlineWidth={0.012}
+        outlineWidth={0.014}
         billboard
+        style={{ textShadow: `0 0 8px ${color}88` }}
       >
         {contact.name}
       </Text>
@@ -100,11 +101,11 @@ function CenterNode() {
       {/* Central sun */}
       <mesh ref={meshRef}>
         <sphereGeometry args={[0.45, 48, 48]} />
-        <meshBasicMaterial color="#ffe600" />
+        <meshBasicMaterial color="#ffff00" />
       </mesh>
       <mesh>
         <sphereGeometry args={[0.7, 48, 48]} />
-        <meshBasicMaterial color="#ffe600" transparent opacity={0.18} />
+        <meshBasicMaterial color="#ffff00" transparent opacity={0.25} />
       </mesh>
     </group>
   );
@@ -112,10 +113,10 @@ function CenterNode() {
 
 function ConnectionLine({ contact, position }: { contact: ContactAnalysis; position: [number, number, number] }) {
   // Animated glowing line, always follows the animated bubble position
-  const color = contact.state === "Thriving" ? "#2dd4a8"
-    : contact.state === "Stable" ? "#eab308"
-    : contact.state === "Drifting" ? "#f97316"
-    : "#ef4444";
+  const color = contact.state === "Thriving" ? "#00ff88"
+    : contact.state === "Stable" ? "#ffff00"
+    : contact.state === "Drifting" ? "#ffaa00"
+    : "#ff2563";
   const [animatedPos, setAnimatedPos] = useState<[number, number, number]>(position);
   useFrame((state) => {
     setAnimatedPos(getAnimatedPosition(position, state.clock.elapsedTime));
@@ -126,7 +127,7 @@ function ConnectionLine({ contact, position }: { contact: ContactAnalysis; posit
   }, [animatedPos]);
   return (
     <line geometry={geometry}>
-      <lineBasicMaterial attach="material" color={color} linewidth={2} transparent opacity={0.32} />
+      <lineBasicMaterial attach="material" color={color} linewidth={3} transparent opacity={0.48} />
     </line>
   );
 }
@@ -184,13 +185,13 @@ export function RelationshipSpace({ contacts, onSelectContact, onExit }: Relatio
         <fog attach="fog" args={["#0f172a", 7, 18]} />
         <Stars radius={60} depth={80} count={1800} factor={2.2} saturation={1} fade speed={1.7} />
         <ambientLight intensity={0.7} />
-        <pointLight position={[0, 6, 0]} intensity={1.5} color="#ffe600" castShadow />
+        <pointLight position={[0, 6, 0]} intensity={2.0} color="#ffff00" castShadow />
         <CenterNode />
         {/* Orbital rings */}
         {rings.map((radius, i) => (
           <mesh key={i} position={[0, 0.09, 0]}>
             <torusGeometry args={[radius, 0.01, 16, 100]} />
-            <meshBasicMaterial color="#a5b4fc" transparent opacity={0.18} />
+            <meshBasicMaterial color="#00d9ff" transparent opacity={0.28} />
           </mesh>
         ))}
         {/* Bubbles and lines */}

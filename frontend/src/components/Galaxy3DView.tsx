@@ -8,15 +8,28 @@ interface Galaxy3DViewProps {
 }
 
 const healthHex = (s: number) => {
-  if (s >= 75) return "#4dffb4";
-  if (s >= 45) return "#b482ff";
-  return "#ff4d6d";
+  if (s >= 75) return "#ffffff";
+  if (s >= 48) return "#00d4ff";
+  return "#ff4d4d";
 };
 
 const healthRGB = (s: number) => {
-  if (s >= 75) return [77, 255, 180];
-  if (s >= 45) return [180, 130, 255];
-  return [255, 77, 109];
+  // High health (75+): Pure white
+  if (s >= 75) return [255, 255, 255];
+  // Medium health (48-74): Cyan
+  if (s >= 48) return [0, 212, 255];
+  // Low health (<48): Red
+  return [255, 77, 77];
+};
+
+// Ring colors based on health
+const getRingColor = (s: number) => {
+  // High health (75+): Purple rings
+  if (s >= 75) return "#b084ff";
+  // Medium health (48-74): Teal/Cyan rings
+  if (s >= 48) return "#00bfff";
+  // Low health (<48): Red rings
+  return "#ff6666";
 };
 
 export const Galaxy3DView: React.FC<Galaxy3DViewProps> = ({ contacts, onContactClick }) => {
@@ -56,6 +69,50 @@ export const Galaxy3DView: React.FC<Galaxy3DViewProps> = ({ contacts, onContactC
 
     const grp = new THREE.Group();
     scene.add(grp);
+
+    // Add visible orbital rings to show planet paths
+    const orbitRadii = [6.5, 10.8, 15.2];
+    orbitRadii.forEach((radius) => {
+      // Create orbit ring lines
+      const orbitGeometry = new THREE.BufferGeometry();
+      const orbitPoints = [];
+      const segments = 128;
+      
+      for (let i = 0; i <= segments; i++) {
+        const angle = (i / segments) * Math.PI * 2;
+        orbitPoints.push(
+          Math.cos(angle) * radius,
+          0,
+          Math.sin(angle) * radius
+        );
+      }
+      
+      orbitGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(orbitPoints), 3));
+      
+      const orbitMaterial = new THREE.LineBasicMaterial({
+        color: 0x4a5568,
+        transparent: true,
+        opacity: 0.6,
+        linewidth: 1
+      });
+      
+      const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+      grp.add(orbitLine);
+      
+      // Add glowing orbit ring
+      const orbitRingGlow = new THREE.Mesh(
+        new THREE.RingGeometry(radius - 0.08, radius + 0.08, 128),
+        new THREE.MeshBasicMaterial({
+          color: 0x64748b,
+          transparent: true,
+          opacity: 0.15,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      orbitRingGlow.rotation.x = Math.PI / 2;
+      grp.add(orbitRingGlow);
+    });
 
     // Enhanced Stars
     const sg = new THREE.BufferGeometry();
@@ -121,45 +178,8 @@ export const Galaxy3DView: React.FC<Galaxy3DViewProps> = ({ contacts, onContactC
     );
     grp.add(sunGlow);
 
-    // Create orbit gradient texture
-    const canvasOrbit = document.createElement('canvas');
-    canvasOrbit.width = 256;
-    canvasOrbit.height = 256;
-    const ctxOrbit = canvasOrbit.getContext('2d')!;
-    const gradOrbit = ctxOrbit.createLinearGradient(0, 0, 256, 256);
-    gradOrbit.addColorStop(0, '#00E5FF');
-    gradOrbit.addColorStop(1, '#7C4DFF');
-    ctxOrbit.fillStyle = gradOrbit;
-    ctxOrbit.fillRect(0, 0, 256, 256);
-    const orbitTex = new THREE.CanvasTexture(canvasOrbit);
-
-    // Orbit rings
+    // Orbit rings - will be created per planet based on health
     const orbitR = [6.5, 10.8, 15.2];
-    orbitR.forEach(r => {
-      // Main bright ring (thickness increased)
-      const m = new THREE.Mesh(
-        new THREE.RingGeometry(r - 0.04, r + 0.04, 128),
-        new THREE.MeshBasicMaterial({ map: orbitTex, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
-      );
-      m.rotation.x = Math.PI / 2;
-      grp.add(m);
-
-      // Outer glow (cyan, 30% opacity)
-      const outerGlow = new THREE.Mesh(
-        new THREE.RingGeometry(r - 0.18, r + 0.18, 128),
-        new THREE.MeshBasicMaterial({ color: 0x00E5FF, transparent: true, opacity: 0.3, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })
-      );
-      outerGlow.rotation.x = Math.PI / 2;
-      grp.add(outerGlow);
-
-      // Inner soft glow (depth)
-      const innerGlow = new THREE.Mesh(
-        new THREE.RingGeometry(r - 0.08, r + 0.08, 128),
-        new THREE.MeshBasicMaterial({ color: 0x7C4DFF, transparent: true, opacity: 0.25, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })
-      );
-      innerGlow.rotation.x = Math.PI / 2;
-      grp.add(innerGlow);
-    });
 
     const angles: { [id: number]: number } = {};
     const planets: { [id: number]: { mesh: THREE.Mesh, mat: THREE.MeshPhysicalMaterial, atmosphere: THREE.Mesh, sz: number, r: number, selR: THREE.Mesh } } = {};
@@ -192,6 +212,39 @@ export const Galaxy3DView: React.FC<Galaxy3DViewProps> = ({ contacts, onContactC
       mesh.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
       mesh.userData = { cIdx: idx };
       grp.add(mesh);
+
+      // Create individual rings for this planet based on health
+      const ringColor = getRingColor(c.healthScore);
+      const ringColorHex = ringColor.replace('#', '0x');
+      const ringColorNum = parseInt(ringColorHex, 16);
+      
+      // Main ring
+      const ringMesh = new THREE.Mesh(
+        new THREE.RingGeometry(sz * 1.3, sz * 1.5, 64),
+        new THREE.MeshBasicMaterial({
+          color: ringColorNum,
+          transparent: true,
+          opacity: 0.7,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      ringMesh.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+      mesh.add(ringMesh);
+
+      // Outer glow ring
+      const outerGlowRing = new THREE.Mesh(
+        new THREE.RingGeometry(sz * 1.2, sz * 1.6, 64),
+        new THREE.MeshBasicMaterial({
+          color: ringColorNum,
+          transparent: true,
+          opacity: 0.25,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      outerGlowRing.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+      mesh.add(outerGlowRing);
 
       // Atmosphere effect
       const atmosphereMat = new THREE.MeshBasicMaterial({

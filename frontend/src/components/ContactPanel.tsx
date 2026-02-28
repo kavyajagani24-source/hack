@@ -8,9 +8,61 @@ interface ContactPanelProps {
 }
 
 const getHealthColor = (s: number) => {
-  if (s >= 75) return "#4dffb4";
-  if (s >= 45) return "#b482ff";
-  return "#ff4d6d";
+  if (s >= 75) return "#00ff88";
+  if (s >= 48) return "#00d9ff";
+  return "#ff2563";
+};
+
+// Circular metric component
+const CircularMetric = ({ value, label, color, maxValue = 100 }: { value: number; label: string; color: string; maxValue?: number }) => {
+  const radius = 38;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (value / maxValue) * circumference;
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative w-28 h-28" style={{ filter: `drop-shadow(0 0 16px ${color}44)` }}>
+        <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+          <circle cx="50" cy="50" r={radius} fill="none" stroke="#0a1a2a" strokeWidth="4" />
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth="4"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className="transition-all duration-300"
+            style={{ filter: `drop-shadow(0 0 8px ${color}88)` }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span style={{ fontSize: '20px', fontWeight: 900, color: color, fontFamily: "'Orbitron', monospace", textShadow: `0 0 12px ${color}66` }}>{value}</span>
+        </div>
+      </div>
+      <span style={{ fontSize: '12px', color: color, textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Orbitron', monospace", fontWeight: 700 }}>{label}</span>
+    </div>
+  );
+};
+
+// Progress bar component
+const ProgressBar = ({ label, value, color }: { label: string; value: number; color: string }) => {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <span style={{ fontSize: '11px', color: '#00d9ff', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Orbitron', monospace", fontWeight: 600 }}>{label}</span>
+        <span style={{ fontSize: '12px', color: color, fontFamily: "'Orbitron', monospace", fontWeight: 700 }}>{value}%</span>
+      </div>
+      <div className="h-2.5 bg-[#0a1a2a] rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 0 8px rgba(0,0,0,0.5)' }}>
+        <div
+          className="h-full transition-all duration-300 rounded-full"
+          style={{ width: `${value}%`, background: `linear-gradient(90deg, ${color}, ${color}dd)`, boxShadow: `0 0 12px ${color}88` }}
+        />
+      </div>
+    </div>
+  );
 };
 
 export function ContactPanel({ contact, onClose }: ContactPanelProps) {
@@ -21,10 +73,17 @@ export function ContactPanel({ contact, onClose }: ContactPanelProps) {
     : contact.trendDirection === "down" ? TrendingDown : Minus;
 
   const stateReason = () => {
-    if (contact.state === "At Risk") return `Only ${contact.interactionCountLast30} interactions in last 30 days, ${contact.daysSinceLastInteraction} days since last contact.`;
-    if (contact.state === "Drifting") return `Frequency declining ${Math.abs(contact.frequencyTrendPercent)}%. Initiation ratio: ${contact.initiationRatio}% you.`;
-    if (contact.state === "Stable") return `Consistent engagement with ${contact.interactionCountLast30} interactions in last 30 days.`;
-    return `Strong reciprocal relationship with frequent, balanced interactions.`;
+    if (contact.state === "At Risk") {
+      return `Critical engagement gap: ${contact.daysSinceLastInteraction} days silent. Only ${contact.interactionCountLast30} messages in last 30 days. Avg response time: ${contact.avgResponseDelay.toFixed(1)}h. Immediate re-engagement recommended.`;
+    }
+    if (contact.state === "Drifting") {
+      const trend = contact.trendDirection === "down" ? "declining" : contact.trendDirection === "up" ? "rising" : "stable";
+      return `Frequency ${trend} at ${Math.abs(contact.frequencyTrendPercent)}%. ${contact.daysSinceLastInteraction} days since last chat. Average response: ${contact.avgResponseDelay.toFixed(1)}h. Engagement dropping - reach out soon.`;
+    }
+    if (contact.state === "Stable") {
+      return `Consistent contact: ${contact.interactionCountLast30} messages last 30 days (vs ${contact.interactionCountPrev30} previously). Avg response: ${contact.avgResponseDelay.toFixed(1)}h. Maintain regular touchpoints to sustain momentum.`;
+    }
+    return `Thriving relationship: Strong engagement with frequent interactions. Avg response time: ${contact.avgResponseDelay.toFixed(1)}h. Balanced reciprocal communication. Keep nurturing this connection.`;
   };
 
   return (
@@ -83,8 +142,77 @@ export function ContactPanel({ contact, onClose }: ContactPanelProps) {
               </span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span style={{ color: '#94a3b8' }}>You initiate</span>
-              <span style={{ color: '#ffffff', fontFamily: "'Orbitron', monospace", fontSize: '16px' }}>{contact.initiationRatio}%</span>
+              <span style={{ color: '#94a3b8' }}>Avg Response Time</span>
+              <span style={{ color: '#ffffff', fontFamily: "'Orbitron', monospace", fontSize: '16px' }}>{contact.avgResponseDelay.toFixed(1)} hours</span>
+            </div>
+          </div>
+
+          {/* Detailed Analysis Metrics */}
+          <div className="pt-6 border-t border-[#1a2a3a]">
+            <h4 style={{ fontSize: '11px', fontFamily: "'Orbitron', monospace", color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Relationship Metrics</h4>
+            
+            {/* Circular Metrics */}
+            <div className="flex justify-around mb-8 gap-4">
+              <CircularMetric
+                value={contact.healthScore}
+                label="Health"
+                color={getHealthColor(contact.healthScore)}
+              />
+              <CircularMetric
+                value={contact.frictionScore}
+                label="Friction"
+                color={contact.frictionScore > 50 ? '#ff2563' : contact.frictionScore > 25 ? '#ffaa00' : '#00ff88'}
+              />
+              <CircularMetric
+                value={contact.debtScore}
+                label="Debt"
+                color="#00d9ff"
+              />
+            </div>
+
+            {/* Communication Style */}
+            <div style={{ padding: '14px', borderRadius: '10px', background: '#0a1a2a', marginBottom: '16px', border: '1px solid #00d9ff33' }}>
+              <h5 style={{ fontSize: '11px', fontFamily: "'Orbitron', monospace", color: '#00d9ff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '14px', fontWeight: 700 }}>Communication Style</h5>
+              <div className="space-y-4">
+                <ProgressBar
+                  label="Your Initiation Share"
+                  value={contact.yourInitiationPercent}
+                  color="#00ff88"
+                />
+                <ProgressBar
+                  label="Emoji-only Replies"
+                  value={contact.emojiOnlyRepliesPercent}
+                  color="#ff00ff"
+                />
+                <ProgressBar
+                  label="One-word Replies"
+                  value={contact.oneWordRepliesPercent}
+                  color="#00d9ff"
+                />
+                <ProgressBar
+                  label="Positive Sentiment"
+                  value={contact.positiveSentimentPercent}
+                  color="#ffff00"
+                />
+              </div>
+            </div>
+
+            {/* Social Debt Ledger */}
+            <div style={{ padding: '14px', borderRadius: '10px', background: '#0a1a2a', marginBottom: '16px', border: '1px solid #00ff8833' }}>
+              <h5 style={{ fontSize: '11px', fontFamily: "'Orbitron', monospace", color: '#00ff88', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '14px', fontWeight: 700 }}>Social Debt Ledger</h5>
+              <div className="flex justify-between items-center">
+                <div className="flex-1 text-center">
+                  <div style={{ fontSize: '22px', fontFamily: "'Orbitron', monospace", fontWeight: 900, color: '#00ff88', textShadow: '0 0 10px #00ff8888' }}>{contact.conversationsYouStarted}</div>
+                  <div style={{ fontSize: '10px', color: '#00d9ff', marginTop: '6px', fontWeight: 600 }}>You Started</div>
+                </div>
+                <div style={{ color: '#64748b', padding: '0 16px', fontSize: '18px' }}>
+                  ⚖️
+                </div>
+                <div className="flex-1 text-center">
+                  <div style={{ fontSize: '22px', fontFamily: "'Orbitron', monospace", fontWeight: 900, color: '#ff2563', textShadow: '0 0 10px #ff256388' }}>{contact.conversationsTheyStarted}</div>
+                  <div style={{ fontSize: '10px', color: '#ff2563', marginTop: '6px', fontWeight: 600 }}>They Started</div>
+                </div>
+              </div>
             </div>
           </div>
 

@@ -4,7 +4,6 @@ import { simulateNoContact } from "@/lib/intelligence-engine";
 import { FileUpload } from "@/components/FileUpload";
 import HomeDashboard from "./HomeDashboard";
 import { RelationshipSpace } from "@/components/RelationshipSpace";
-import { ContactPanel } from "@/components/ContactPanel";
 import { AnimatePresence, motion } from "framer-motion";
 
 const pageVariants = {
@@ -69,11 +68,6 @@ const Index = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <ContactPanel
-        contact={selectedContact}
-        onClose={() => setSelectedContact(null)}
-      />
     </div>
   );
 };

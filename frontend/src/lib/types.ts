@@ -19,6 +19,15 @@ export interface ContactAnalysis {
   state: RelationshipState;
   suggestedAction: string;
   trendDirection: "up" | "down" | "stable";
+  // New fields for detailed analysis
+  frictionScore: number;
+  debtScore: number;
+  yourInitiationPercent: number;
+  emojiOnlyRepliesPercent: number;
+  oneWordRepliesPercent: number;
+  positiveSentimentPercent: number;
+  conversationsYouStarted: number;
+  conversationsTheyStarted: number;
 }
 
 export function getStateColor(state: RelationshipState): string {
