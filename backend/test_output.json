@@ -1,0 +1,70 @@
+{
+  "chat_type": "1on1",
+  "contact": "Sarah Chen",
+  "scores": {
+    "health_score": 89.5,
+    "social_debt_score": 14.3,
+    "friction_score": 20.3,
+    "health_state": "Thriving",
+    "friction_state": "Smooth",
+    "debt_state": "Balanced",
+    "relationship_type": "Casual"
+  },
+  "features": {
+    "chat_type": "1on1",
+    "contact": "Sarah Chen",
+    "total_messages": 10,
+    "days_since_last": 0,
+    "last_30_count": 10,
+    "prev_30_count": 0,
+    "frequency_trend_pct": 1000.0,
+    "longest_silence_days": 4,
+    "sudden_silence": false,
+    "total_days_active": 12,
+    "total_sessions": 7,
+    "you_initiated": 4,
+    "initiation_ratio": 0.571,
+    "max_consecutive_you": 2,
+    "you_close_ratio": 0.429,
+    "unanswered_count": 2,
+    "avg_delay_hours": 0.0,
+    "delay_trend": 0.0,
+    "avg_len_you": 3.4,
+    "avg_len_contact": 3.4,
+    "effort_ratio": 1.0,
+    "contact_one_word_pct": 0.4,
+    "contact_emoji_pct": 0.0,
+    "question_ratio": 0.333,
+    "avg_sentiment": 0.1144,
+    "sentiment_trend": -0.2859,
+    "sentiment_breakdown": {
+      "avg": 0.1144,
+      "trend": -0.2859,
+      "direction": "declining",
+      "early_positive_pct": 50.0,
+      "recent_positive_pct": 0.0,
+      "early_negative_pct": 0.0,
+      "recent_negative_pct": 0.0
+    },
+    "emoji_analysis": {
+      "total_emojis": 0,
+      "avg_emoji_sentiment_score": 0.0,
+      "top_emojis": []
+    },
+    "plan_proposals_total": 4,
+    "plan_proposals_you": 3,
+    "plan_proposals_contact": 1,
+    "need_ratio": 0.0,
+    "event_mentions": [],
+    "support_rate": 0.0
+  },
+  "nudges": [
+    {
+      "type": "plan_imbalance",
+      "urgency": 0.6,
+      "icon": "📅",
+      "reason": "You've proposed most plans (3 vs their 1).",
+      "action": "Stop proposing plans for a while. If Sarah Chen wants to meet, they will reach out."
+    }
+  ]
+}

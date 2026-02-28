@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import { ChatLog, ContactAnalysis } from "@/lib/types";
-import { analyzeRelationships, simulateNoContact } from "@/lib/intelligence-engine";
+import { ContactAnalysis } from "@/lib/types";
+import { simulateNoContact } from "@/lib/intelligence-engine";
 import { FileUpload } from "@/components/FileUpload";
 import HomeDashboard from "./HomeDashboard";
 import { RelationshipSpace } from "@/components/RelationshipSpace";
@@ -26,10 +26,9 @@ const Index = () => {
   const [view, setView] = useState<"upload" | "dashboard" | "ar">("upload");
   const [isSimulated, setIsSimulated] = useState(false);
 
-  const handleDataLoaded = useCallback((data: ChatLog[]) => {
-    const analyzed = analyzeRelationships(data);
-    setContacts(analyzed);
-    setOriginalContacts(analyzed);
+  const handleDataLoaded = useCallback((data: ContactAnalysis[]) => {
+    setContacts(data);
+    setOriginalContacts(data);
     setView("dashboard");
   }, []);
 
