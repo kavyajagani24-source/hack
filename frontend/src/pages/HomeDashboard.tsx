@@ -34,8 +34,8 @@ export default function HomeDashboard({
   };
 
   const pendingIssues = contacts.filter(c => c.state === 'At Risk').length;
-  const memoryTriggers = 4; // Mock
-  const pendingActions = 6; // Mock
+  const memoryTriggers = 7; // Mock
+  const pendingActions = 12; // Mock
 
   return (
     <div style={{ minHeight: '100vh', background: '#020209', fontFamily: "'DM Sans', sans-serif", color: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
@@ -136,7 +136,7 @@ export default function HomeDashboard({
           <div style={{ position: 'absolute', top: '70px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '24px', padding: '0 24px', pointerEvents: 'none', zIndex: 10 }}>
             {/* Avg Pulse */}
             <div style={{ background: '#4dffb4', border: 'none', borderRadius: '12px', padding: '12px 24px', textAlign: 'center', boxShadow: '0 2px 16px #4dffb488' }}>
-              <div style={{ fontFamily: "'Orbitron', monospace", fontSize: '26px', fontWeight: 900, color: '#020209', textShadow: '0 1px 8px #fff' }}>74</div>
+              <div style={{ fontFamily: "'Orbitron', monospace", fontSize: '26px', fontWeight: 900, color: '#020209', textShadow: '0 1px 8px #fff' }}>68</div>
               <div style={{ fontSize: '11px', color: '#020209', letterSpacing: '2px', marginTop: '4px', fontWeight: 700 }}>AVG PULSE</div>
             </div>
             {/* At Risk */}
@@ -156,7 +156,7 @@ export default function HomeDashboard({
             </div>
             {/* Top Bond */}
             <div style={{ background: '#60a5fa', border: 'none', borderRadius: '12px', padding: '12px 24px', textAlign: 'center', boxShadow: '0 2px 16px #60a5fa88' }}>
-              <div style={{ fontFamily: "'Orbitron', monospace", fontSize: '26px', fontWeight: 900, color: '#fff', textShadow: '0 1px 8px #fff' }}>91%</div>
+              <div style={{ fontFamily: "'Orbitron', monospace", fontSize: '26px', fontWeight: 900, color: '#fff', textShadow: '0 1px 8px #fff' }}>87%</div>
               <div style={{ fontSize: '11px', color: '#fff', letterSpacing: '2px', marginTop: '4px', fontWeight: 700 }}>TOP BOND</div>
             </div>
           </div>
@@ -201,19 +201,19 @@ export default function HomeDashboard({
             {/* Contact Cards Grid (Reusing basic tabular view logic but applying theme colors) */}
             <div className="flex gap-8 mb-8 mt-12">
               <div className="flex-1 bg-[#07071a] rounded-xl px-6 py-6 text-center border border-[#1a2a3a] shadow-lg">
-                <div className="text-4xl font-bold text-[#4dffb4]" style={{ fontFamily: "'Orbitron', monospace" }}>72</div>
+                <div className="text-4xl font-bold text-[#4dffb4]" style={{ fontFamily: "'Orbitron', monospace" }}>69</div>
                 <div className="text-[9px] text-[#4a5568] mt-2 tracking-widest uppercase font-mono-display">Avg Health</div>
               </div>
               <div className="flex-1 bg-[#07071a] rounded-xl px-6 py-6 text-center border border-[#1a2a3a] shadow-lg">
-                <div className="text-4xl font-bold text-[#4dffb4]" style={{ fontFamily: "'Orbitron', monospace" }}>4</div>
+                <div className="text-4xl font-bold text-[#4dffb4]" style={{ fontFamily: "'Orbitron', monospace" }}>6</div>
                 <div className="text-[9px] text-[#4a5568] mt-2 tracking-widest uppercase font-mono-display">Thriving</div>
               </div>
               <div className="flex-1 bg-[#07071a] rounded-xl px-6 py-6 text-center border border-[#1a2a3a] shadow-lg">
-                <div className="text-4xl font-bold text-[#b482ff]" style={{ fontFamily: "'Orbitron', monospace" }}>0</div>
+                <div className="text-4xl font-bold text-[#b482ff]" style={{ fontFamily: "'Orbitron', monospace" }}>2</div>
                 <div className="text-[9px] text-[#4a5568] mt-2 tracking-widest uppercase font-mono-display">Drifting</div>
               </div>
               <div className="flex-1 bg-[#07071a] rounded-xl px-6 py-6 text-center border border-[#1a2a3a] shadow-lg">
-                <div className="text-4xl font-bold text-[#ff4d6d]" style={{ fontFamily: "'Orbitron', monospace" }}>1</div>
+                <div className="text-4xl font-bold text-[#ff4d6d]" style={{ fontFamily: "'Orbitron', monospace" }}>3</div>
                 <div className="text-[9px] text-[#4a5568] mt-2 tracking-widest uppercase font-mono-display">At Risk</div>
               </div>
             </div>
